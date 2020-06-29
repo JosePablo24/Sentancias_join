@@ -1,0 +1,66 @@
+1
+.- ° ° ! " # $ % & / ( ) ^ ; - · ·  ̣-  ` ¨ ~ ¬ | @ ½ \ ¸  ¡ æ ł € ¶ ŧ ← ↓ → ø þ æ ß ð đ ŋ ħ  ̉  ̉ł « » ¢ “ ” µh { 
+
+2
+inner join 
+Campos_muestra { 
+Campos : *.Producto 
+ Campo1 : id_producto.Ventas 
+ Campo2 : id Campo3 : nombre.Producto } , Tablas { Tabla1 : Productos ,  Tabla2 : Ventas } , Condiciones { On { Condicion_on1 : id.Producto Condicion_on2 : id_Productos.Ventas } ,  Where { Condicion_tabla1 : id Condicion_tabla2 : id_Producto  } ,  Order_by { Condicion_order : id.Productos } }
+
+3
+inner join Campos_muestra { Campos : *.Producto Campo1 : id_producto.Ventas ,    Campo2 : id , Campo3 : nombre.Producto } ,  Tablas { Tabla1 : Productos ,  Tabla2 : Ventas } , Condiciones { On { Condicion_on1 : id.Producto Condicion_on2 : id_Productos.Ventas } ,  Where { Condicion_tabla1 : id Condicion_tabla2 : id_Producto  } ,  Order_by { Condicion_order : id.Productos } }
+
+4
+inner join 
+Campos_muestra { 
+ Campos : *.Producto 
+ Campo1 : id_producto.Ventas 
+ Campo2 : id 
+ Campo3 : nombre.Producto 
+ } 
+ Tablas { 
+ Tabla1 : Productos 
+ Tabla2 : Ventas 
+ } 
+ Condiciones { 
+ On { 
+ CondicionOn1 : id.Producto 
+ CondicionOn2 : id_Productos.Ventas 
+ } , 
+ Where { 
+ Condicion_tabla1 : id.Producto = 'hola' 
+ Condicion_operador : and 
+ Condicion_tabla2 : fecha = '12-12-2020' 
+ } ,  
+ Order_by { 
+ Condicion_order : id.Productos 
+ } 
+ } 
+
+5
+inner join 
+Campos_muestra { 
+Campos : *.Producto 
+ Campo1 : id_producto.Ventas 
+ Campo2 : id 
+ Campo3 : nombre.Producto 
+ } 
+ Tablas { 
+ Tabla1 : Productos 
+ Tabla2 : Ventas 
+ } 
+ Condiciones { 
+ On { 
+ CondicionOn1 : id.Producto 
+ CondicionOn2 : id_Productos.Ventas 
+ } , 
+ Where { 
+ Condicion_tabla1 : id.Producto = 'hola' 
+ Condicion_operador : and 
+ Condicion_tabla2 : fecha = '12-12-2020' 
+ } , 
+ Order_by { 
+ Condicion_order : id.Productos 
+ } 
+ } 
