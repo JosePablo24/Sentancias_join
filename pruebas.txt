@@ -14,18 +14,15 @@ inner join Campos_muestra { Campos : *.Producto Campo1 : id_producto.Ventas ,   
 4
 inner join 
 Campos_muestra { 
- Campos : *.Producto 
- Campo1 : id_producto.Ventas 
- Campo2 : id 
- Campo3 : nombre.Producto 
- } 
+Campos : *.Producto 
+ Campo1 : id_producto.Ventas } , 
  Tablas { 
  Tabla1 : Productos 
  Tabla2 : Ventas 
  } 
  Condiciones { 
  On { 
- CondicionOn1 : id.Producto 
+ CondicionOn1 : id.Producto.Producto 
  CondicionOn2 : id_Productos.Ventas 
  } , 
  Where { 
@@ -44,23 +41,17 @@ Campos_muestra {
 Campos : *.Producto 
  Campo1 : id_producto.Ventas 
  Campo2 : id 
- Campo3 : nombre.Producto 
- } 
+ Campo3 : nombre.Producto } , 
  Tablas { 
  Tabla1 : Productos 
- Tabla2 : Ventas 
- } 
+ Tabla2 : Ventas } , 
  Condiciones { 
  On { 
  CondicionOn1 : id.Producto 
- CondicionOn2 : id_Productos.Ventas 
- } , 
+ CondicionOn2 : id_Productos.Ventas } , 
  Where { 
  Condicion_tabla1 : id.Producto = 'hola' 
  Condicion_operador : and 
- Condicion_tabla2 : fecha = '12-12-2020' 
- } , 
+ Condicion_tabla2 : fecha = '12-12-2020' } , 
  Order_by { 
- Condicion_order : id.Productos 
- } 
- } 
+ Condicion_order : id.Productos } } 

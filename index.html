@@ -21,7 +21,7 @@
                 ejemplo :
                 inner join
 Campos_Muestra { 
-  Campos : *.Producto 
+  Campos : *.Producto , 
   Campo1 : id_producto.Ventas , 
   Campo2 : id ,
   Campo3 : nombre.Producto
@@ -49,26 +49,20 @@ Campos_muestra {
 Campos : *.Producto 
  Campo1 : id_producto.Ventas 
  Campo2 : id 
- Campo3 : nombre.Producto 
- } 
+ Campo3 : nombre.Producto } , 
  Tablas { 
  Tabla1 : Productos 
- Tabla2 : Ventas 
- } 
+ Tabla2 : Ventas } , 
  Condiciones { 
  On { 
  CondicionOn1 : id.Producto 
- CondicionOn2 : id_Productos.Ventas 
- } , 
+ CondicionOn2 : id_Productos.Ventas } , 
  Where { 
  Condicion_tabla1 : id.Producto = 'hola' 
  Condicion_operador : and 
- Condicion_tabla2 : fecha = '12-12-2020' 
- } , 
+ Condicion_tabla2 : fecha = '12-12-2020' } , 
  Order_by { 
- Condicion_order : id.Productos 
- } 
- } 
+ Condicion_order : id.Productos } } 
 </textarea>
             </div>
             <button type="button" class="btn btn-primary" onclick="principal()">Imprimir</button>
