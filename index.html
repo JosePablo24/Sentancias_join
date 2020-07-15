@@ -13,38 +13,80 @@
     <script src="index.js"></script>
 </head>
 <body>
-        <h2>Analizador Lexico</h2>
-        <form name="formularioLSG">
-            <div class="form-group" >
-                <label for="exampleFormControlTextarea1">Gramatica</label>
-                <textarea  class="form-control" id="exampleFormControlTextarea1" rows="6" style="resize: none" placeholder=" ingresa tu cadena aqui 
-                ejemplo :
-                inner join
+    <div class="card" style="align-content: center;" style="width: 50rem;" id="card">    
+      <div class="card-body">
+        <h2 class="card-title">Aplicacion para definir la estructura de una sentencia join</h2>
+        <p class="card-text">Esta Aplicacion te permitira obtener una referencia de como debe ser tu sentencia join de acuerdo a las tablas propuestas en esta pantalla</p>
+            <div id="nombreBaseDatos">
+                      <label>Base de datos</label>
+                      <input type="text" class="form-control is-invalid" id="base" required>
+                      <div class="invalid-feedback" id="advertencia">
+                        Introduce una base de datos
+                      </div>
+              <button type="submit" class="btn btn-primary mb-2" onclick="basedeDatos()" id="boton">Entendido</button>
+            </div>
+
+            <div id="nombreTablas" style="display: none;">
+              <label>Tablas</label>
+              <input type="text" class="form-control is-invalid" id="tabla" required>
+              <div class="invalid-feedback" id="advertencia1">
+                Introduce una Tabla
+              </div>
+              <button type="submit" class="btn btn-primary mb-2" onclick="tablasBase()" id="boton1">Entendido</button>
+            </div>
+            <div id="BaseCompleta" style="display: none;">
+              <div class="" style="width: 18rem;">
+                <div class="card-body">
+                  <h5 class="card-title" id="title">Farmacia</h5>
+                  <h6 class="card-subtitle mb-2 text-muted">Tablas</h6>
+                  <div id="tablasN">
+
+                  </div>
+                </div>
+              </div>
+
+            </div>
+        <label >Si terminaste de introducir las tablas y la base de datos presiona el boton de entendido   </label>
+        <button type="submit" class="btn btn-primary mb-2" onclick="mostrarpantalla()">Entendido</button>
+      </div>
+      <div class="alert alert-danger" role="alert" role="alert" style="display:none" id="invalidoTablaBaseDatos">
+        introduce
+      </div>
+    </div>
+    
+    <div class="card" style="align-content: center; display: none" style="width: 50rem; display: none;" id="formu">
+      <h2>Productor de Sentencias join </h2>
+      <form name="formularioLSG">
+          <div class="form-group" >
+              <label for="exampleFormControlTextarea1">Gramatica</label>
+              <textarea  class="form-control" id="exampleFormControlTextarea1" rows="6" style="resize: none" placeholder=" ingresa tu cadena aqui 
+              ejemplo :
+              inner join
 Campos_Muestra { 
-  Campos : *.Producto , 
-  Campo1 : id_producto.Ventas , 
-  Campo2 : id ,
-  Campo3 : nombre.Producto
-  } ,    
+Campos : *.Producto , 
+Campo1 : id_producto.Ventas , 
+Campo2 : id ,
+Campo3 : nombre.Producto
+} ,    
 Tablas { 
-  Tabla1 : Productos , 
-  Tabla2 : Ventas
-  } ,   
+Tabla1 : Productos , 
+Tabla2 : Ventas
+} ,   
 Condiciones {
-    On { 
-      Condicion_on1 : id.Producto
-      Condicion_on2 : id_Productos.Ventas
-    } , 
-    Where { 
-      condicion_tabla1 : id 
-      condicion_tabla2 : id_Producto 
-    } , 
-    Order_by { 
-      Condicion_order : id.Productos
-      } 
-  }
-  
-                ">inner join 
+  On { 
+    Condicion_on1 : id.Producto
+    Condicion_on2 : id_Productos.Ventas
+  } , 
+  Where { 
+    condicion_tabla1 : id 
+    condicion_tabla2 : id_Producto 
+  } , 
+  Order_by { 
+    Condicion_order : id.Productos
+    } 
+}
+
+              ">inner join 
 Campos_muestra { 
 Campos : *.Producto 
  Campo1 : id_producto.Ventas 
@@ -62,52 +104,55 @@ Campos : *.Producto
  Condicion_operador : and 
  Condicion_tabla2 : fecha = '12-12-2020' } , 
  Order_by { 
- Condicion_order : id.Productos } } 
-</textarea>
-            </div>
-            <button type="button" class="btn btn-primary" onclick="principal()">Imprimir</button>
-            <button type="button" class="btn btn-primary" onclick="limpiar()">Limpiar</button>
-            <button type="button" class="btn btn-primary" id="mostrar" onclick="mostrar_tabla()">Ocultar Tabla Token's</button>
-            <button type="button" class="btn btn-primary" id="mostrar1" onclick="mostrar_tabla1()">Mostrar Tabla Pila</button>
-        </form>        
-        <!-- <div class="alert alert-danger" role="alert">
-                No ha metido la cadena favor de hacerlo
-        </div> -->
-        <br>
-        <h1 id="titulo_tokens">Tabla Token's</h1>
-        <div id="datos_tabla" > <!--style="display: none">-->
-                <form>
-                    <table class="table table-hover" >                
-                    <thead>
-                    <tr>                        
-                        <th scope="col">Token's</th>
-                        <th scope="col">Descripcion Informal</th>
-                        <th scope="col">Color</th>
-                        <th scope="col">Lexema</th>
-                    </tr>
-                    </thead>
-                    <tbody id="tablita">                  
-                    </tbody>
-                    </table> 
-            </form>
-        </div>
-        <br/>
-        <h1 id="titulo_pila" style="display: none"> Tabla Pila</h1>
-        <div id="datos_pila" style="display: none">
-                <form>
-                    <table class="table table-hover" >                
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>                        
-                        <th scope="col">Acción</th>                                            
-                        <th scope="col">Muestra</th>
-                        <th scope="col">Color</th>
-                    </tr>
-                    </thead>
-                    <tbody id="tablita1">                  
-                    </tbody>
-                    </table> 
-            </form>
-        </div>                     
+ Condicion_order : id.Productos } } </textarea>
+          </div>
+          <button type="button" class="btn btn-primary" onclick="principal()">Imprimir</button>
+          <button type="button" class="btn btn-primary" onclick="limpiar()">Limpiar</button>
+          <button type="button" class="btn btn-primary" id="mostrar" onclick="mostrar_tabla()">Ocultar Tabla Token's</button>
+          <button type="button" class="btn btn-primary" id="mostrar1" onclick="mostrar_tabla1()">Mostrar Tabla Pila</button>
+      </form>        
+      <div class="alert alert-success" role="alert" role="alert" role="alert" style="display:none" id="valido">
+        Tu cadena ha sido encontrada como valida 
+      </div>
+      <div class="alert alert-danger" role="alert" role="alert" style="display:none" id="invalido">
+        En algun punto ha sido erronea la cadenas
+      </div>
+      <br>
+      <h1 id="titulo_tokens">Tabla Token's</h1>
+      <div id="datos_tabla" > <!--style="display: none">-->
+              <form>
+                  <table class="table table-hover" >                
+                  <thead>
+                  <tr>                        
+                      <th scope="col">Token's</th>
+                      <th scope="col">Descripcion Informal</th>
+                      <th scope="col">Color</th>
+                      <th scope="col">Lexema</th>
+                  </tr>
+                  </thead>
+                  <tbody id="tablita">                  
+                  </tbody>
+                  </table> 
+          </form>
+      </div>
+      <br/>
+      <h1 id="titulo_pila" style="display: none"> Tabla Pila</h1>
+      <div id="datos_pila" style="display: none">
+              <form>
+                  <table class="table table-hover" >                
+                  <thead>
+                  <tr>
+                      <th scope="col">#</th>                        
+                      <th scope="col">Acción</th>                                            
+                      <th scope="col">Muestra</th>
+                      <th scope="col">Color</th>
+                  </tr>
+                  </thead>
+                  <tbody id="tablita1">                  
+                  </tbody>
+                  </table> 
+          </form>
+      </div>                     
+    </div>
 </body>
 </html>

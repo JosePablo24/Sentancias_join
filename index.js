@@ -10,7 +10,8 @@ var columnas = new RegExp ("^[a-z]+_*[0-9]*[a-z]*$|^[a-z]+_?[A-Z]?[a-z]+[.][A-Z]
 var errores = new RegExp(">>+|=+>+|<<+=+|><|<<+|==+")//|{}|&&&+|^[&]$|^[!]$|^\"$|^'$|#|[$]|[%]|[?]|[¡]|^=$|[+]|;|[°]|[|]|[\[]|\]|¬|^_$|-|[~]|¨|`|\\\\|\\\^|@|^\"+$|^'+$|[)]+\"+|,,+|[)][)]+|[(][(]+|{{+|}}+|''+")//
 var errores_Letra = new RegExp ("[a-z]+[-]+|[a-z]+[(]+")//|[a-z]+_?[/]+|[a-z]+_?{+}+|[a-z]+_?[)]+|[a-z]+_?{$}+|[a-z]+_?%+|[a-z]+_?[-]+|[a-z]+_?=+|[a-z]+_?<+|[a-z]+_?>+|[a-z]+_?&+|^[1-9]+[a-z]+_?|^[)]+[a-z]+|^[(]+[a-z]+|^[{]+[a-z]+|^[}]+[a-z]+")//|^\"+[a-z]+[0-9]*$|^[a-z]+\"+|^>+[a-z]+|[a-z]+,+|[a-z]+[.]+")
 var errores_Num = new RegExp ("[0-9]+_?|0-9]+_?[(]+|[0-9]+_?[/]+")//|[0-9]+_?{+}+|[0-9]+_?[)]+|[0-9]+_?{$}+|[0-9]+_?%+|[0-9]+_?[-]+|[0-9]+_?=+|[0-9]+_?<+|[0-9]+_?>+|[0-9]+_?&+|^[)]+[0-9]+|^[(]+[0-9]+|^[{]+[0-9]+|^[}]+[0-9]+|^\"+[0-9]+[a-z]*$|[0-9]+_+$|^[0-9]+\"+$")//|[0-9]+_+[0-9]+|<+[0-9]+|>+[0-9]+|[0-9]+!+")
-
+var baseDatos = ''
+var tablasBaseDatos = []
 
 // Auxiliares para sacar pila
 var camposHelp =  new RegExp ("^Campos$|^Campo[0-9]+$")
@@ -20,11 +21,15 @@ var condicionTablaHelp = new RegExp ("^Condicion_tabla[0-9]+$")
 // Variables ocultar tabla
 var valor = false
 var valor1 = true
+var valor2 = false
+var valor3 = false
+var valor4 = false
+var valor5 = false
 
-function principal() {
+const principal = async () => {
     document.getElementById('tablita').innerHTML = '';
     document.getElementById('tablita1').innerHTML = '';
-    var info_textarea= document.getElementById("exampleFormControlTextarea1").value;    
+    var info_textarea= document.getElementById("exampleFormControlTextarea1").value;
     var sin_saltos=info_textarea.replace("\n","");
     var otro = sin_saltos.replace("\n","")
     var cadena = otro.split(" ");
@@ -76,7 +81,7 @@ function principal() {
     var pasa_on = false; var pasa_condicionOn = false; var pasa_dos_puntos2 = false; var pasa_columna1 = false
     var pasa_where = false; var pasa_condicionwhere = false; var pasa_dos_puntos3 = false; var pasa_columna2 = false; var pasa_valores = false; var pasa_condicionOpe = false; var pasa_dos_puntos4 = false; var pasa_operadores = false
     var pasa_order = false; var pasa_condicionOrder = false; var pasa_dos_puntos5 = false; var pasa_columna3 = false; var al_fin = false
-    hay_error = false
+    hay_error = false; var termina_fin = false
 
     arreglo_joins = []
     arreglo_columnas = []
@@ -84,7 +89,8 @@ function principal() {
     arreglo_condicionOn = []
     arreglo_where = []
     arreglo_orderBy = []
-    
+    div = document.getElementById('invalido');
+    div1 = document.getElementById('valido');
     if(info_textarea != ''){
         if(cadena[0] == 'inner'|| cadena[0] == 'left' || cadena[0] == 'right' || cadena[0] ==' outer'){
             console.log('la entrada es valida')
@@ -338,7 +344,7 @@ function principal() {
                                     if(cadena[contador + 1] == '}'){
                                         console.log(numero,".- Se extrae → ", stack.peek() ,' - Variables → ', element)
                                         stack.pop()
-                                        termina = true                                    
+                                        termina_fin = true
                                     }else{
                                         hay_error = true
                                     }                                    
@@ -449,6 +455,10 @@ function principal() {
                                 }else{
                                     hay_error = true
                                 }
+                            }
+                            if(element == '}' && termina_fin == true){
+                                stack.pop()
+                                termina_fin = false                                
                             }
                         } else                        
                         if (signos.test(element)) {
@@ -573,19 +583,30 @@ function principal() {
         });
         //console.log(pos);
         if(stack.peek() == '$'){
-            simbolo.push('}')            
+            if (valor2 == false) {                        
+                div1.style.display = '';
+            }            
         }else if(hay_error == true){
             stack.push('¡ERROR!')
-            alert('Hubo un error en algun punto')
+            if (valor2 == false) {        
+                div = document.getElementById('invalido');
+                div.style.display = '';
+            }
         }
         console.log(numero, " Se quedo pila →", stack.print());
         impresionTablaPila('pila', stack, 0 , numero)
         console.log('Select',arreglo_columnas, 'From',arreglo_tablas[0],arreglo_joins,arreglo_tablas[1],'On',arreglo_condicionOn[0],'=',arreglo_condicionOn[1],'where',arreglo_where,'Order by',arreglo_orderBy);
         
-    }else{
-        alert('Introduce una entrada valida')
+    }else{        
+        valor2?uno.innerText = "En algun punto ha sido erronea la cadenas":uno.innerText = "Mete alguna cadena valida";
+        if (valor2 == false) {
+            div.style.display = '';            
+        }
     }
     impresionTabla(reservada,tabla, signo, var_cadena, simbolo, valor, error, columna, comparacion)
+    await delay(7000);
+    div.style.display = 'none';
+    div1.style.display = 'none';
 }
 
 function pilaActualizar(datas, rules, stack, cadena, numero) {    
@@ -667,6 +688,68 @@ function limpiar() {
     document.getElementById('tablita1').innerHTML = '';
     document.getElementById("exampleFormControlTextarea1").value = "";    
 }
+var baseTablas = new RegExp("^[A-Z]?[a-z]+[0-9]*_?[a-z]*[0-9]*$")
+const basedeDatos = async () => {
+    var info_input= document.getElementById("base").value;
+    var uno = document.getElementById('advertencia');
+    var dos = document.getElementById('base');
+    var tres = document.getElementById("nombreBaseDatos");
+    var cuatro = document.getElementById("nombreTablas");
+    var cinco = document.getElementById("BaseCompleta")
+    var seis = document.getElementById("title")
+    if(info_input != ''){
+        if (baseTablas.test(info_input)) {
+            $('#boton')[0].disabled = true;
+            $('#base')[0].disabled = true;
+            dos.className = 'form-control is-valid'
+            uno.className= 'valid-feedback'
+            valor4?uno.innerText = "Introduce una base de datos":uno.innerText = "Nombre de la base de datos valida" ;
+            baseDatos = info_input                        
+            await delay(5000);
+            tres.style.display = 'none'
+            cuatro.style.display = ''
+            seis.innerText = baseDatos
+            cinco.style.display = ''
+        }else{
+            
+            valor4?uno.innerText = "Introduce una base de datos":uno.innerText = "No se aceptan errores como: " + info_input;
+            await delay(3000);
+            valor4?uno.innerText = "Introduce una base de datos":uno.innerText = "Introduce una Base de Datos correctamente";
+            
+        }
+    }
+}
+
+const tablasBase= async () => {
+    var info_input= document.getElementById("tabla").value;
+    var uno = document.getElementById('advertencia1');
+    var dos = document.getElementById('tabla');
+    if(info_input != ''){
+        if (baseTablas.test(info_input)) {
+            $('#boton1')[0].disabled = true;
+            $('#tabla')[0].disabled = true;
+            var dato = info_input
+            var btn =  document.createElement("li"); btn.innerHTML = dato; document.getElementById("tablasN").appendChild(btn)            
+            dos.className = 'form-control is-valid'
+            uno.className= 'valid-feedback'
+            valor5?uno.innerText = "Introduce una Tabla":uno.innerText = " El nombre de la tabla es valido" ;
+            tablasBaseDatos.push(info_input)            
+            await delay(2000);
+            dos.className = 'form-control is-invalid'
+            uno.className= 'invalid-feedback'
+            valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "Introduce una Tabla" ;
+            document.getElementById("tabla").value = "";
+            $('#boton1')[0].disabled = false;
+            $('#tabla')[0].disabled = false;
+        }else{
+            
+            valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "No se aceptan errores como: " + info_input;
+            await delay(3000);
+            valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "Introduce una Tabla correctamente";
+            
+        }
+    }
+}
 
 function mostrar_tabla() {    
     var uno = document.getElementById('mostrar');
@@ -676,7 +759,7 @@ function mostrar_tabla() {
         div = document.getElementById('datos_tabla');
         div.style.display = '';
         div1 = document.getElementById('titulo_tokens');
-        div1.style.display = '';
+        div1.style.display = '';        
     }
     if (valor == true) {        
         div = document.getElementById('datos_tabla');
@@ -701,6 +784,39 @@ function mostrar_tabla1() {
         div1 = document.getElementById('titulo_pila');
         div.style.display = 'none';
         div1.style.display = 'none';
+    }
+}
+
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
+const mostrarpantalla = async () => {
+    if(tablasBaseDatos.length >= 1 && baseDatos != ''){
+        var elemento = document.getElementById("card");
+        elemento.style.display = 'none';
+        var elemento = document.getElementById("formu");
+        elemento.style.display = 'block';   
+    }
+    else{
+        var uno = document.getElementById('invalidoTablaBaseDatos');
+        div = document.getElementById('invalidoTablaBaseDatos');
+        if (valor2 == false) {
+            if(tablasBaseDatos.length == 0 && baseDatos == ''){
+                valor2?uno.innerText = "introduce":uno.innerText = "Introduce alguna Base de datos y algunas columnas";
+            }else{
+                if(tablasBaseDatos.length == 0){
+                    valor2?uno.innerText = "introduce":uno.innerText = "Introduce algunas columnas";
+                }
+                if(tablasBaseDatos.length == 1){
+                    valor2?uno.innerText = "introduce":uno.innerText = "Introduce mas de una columna";
+                }
+                if(baseDatos == ''){
+                    valor2?uno.innerText = "introduce":uno.innerText = "Introduce una base de datos";
+                }
+            }            
+            div.style.display = '';
+        }
+        await delay(5000);
+        div.style.display = 'none';
     }
 }
 
