@@ -10,8 +10,8 @@ var columnas = new RegExp ("^[a-z]+_*[0-9]*[a-z]*$|^[a-z]+_?[A-Z]?[a-z]+[.][A-Z]
 var errores = new RegExp(">>+|=+>+|<<+=+|><|<<+|==+")//|{}|&&&+|^[&]$|^[!]$|^\"$|^'$|#|[$]|[%]|[?]|[¡]|^=$|[+]|;|[°]|[|]|[\[]|\]|¬|^_$|-|[~]|¨|`|\\\\|\\\^|@|^\"+$|^'+$|[)]+\"+|,,+|[)][)]+|[(][(]+|{{+|}}+|''+")//
 var errores_Letra = new RegExp ("[a-z]+[-]+|[a-z]+[(]+")//|[a-z]+_?[/]+|[a-z]+_?{+}+|[a-z]+_?[)]+|[a-z]+_?{$}+|[a-z]+_?%+|[a-z]+_?[-]+|[a-z]+_?=+|[a-z]+_?<+|[a-z]+_?>+|[a-z]+_?&+|^[1-9]+[a-z]+_?|^[)]+[a-z]+|^[(]+[a-z]+|^[{]+[a-z]+|^[}]+[a-z]+")//|^\"+[a-z]+[0-9]*$|^[a-z]+\"+|^>+[a-z]+|[a-z]+,+|[a-z]+[.]+")
 var errores_Num = new RegExp ("[0-9]+_?|0-9]+_?[(]+|[0-9]+_?[/]+")//|[0-9]+_?{+}+|[0-9]+_?[)]+|[0-9]+_?{$}+|[0-9]+_?%+|[0-9]+_?[-]+|[0-9]+_?=+|[0-9]+_?<+|[0-9]+_?>+|[0-9]+_?&+|^[)]+[0-9]+|^[(]+[0-9]+|^[{]+[0-9]+|^[}]+[0-9]+|^\"+[0-9]+[a-z]*$|[0-9]+_+$|^[0-9]+\"+$")//|[0-9]+_+[0-9]+|<+[0-9]+|>+[0-9]+|[0-9]+!+")
-var baseDatos = ''
-var tablasBaseDatos = []
+var baseDatos = 'Pet'
+var tablasBaseDatos = ['Ventas', 'Producto']
 
 // Auxiliares para sacar pila
 var camposHelp =  new RegExp ("^Campos$|^Campo[0-9]+$")
@@ -19,7 +19,7 @@ var condicionHep = new RegExp ("^[a-z]+_?[A-Z]?[a-z]+[.]?[A-Z]?[a-z]+_?[a-z]+$")
 var condicionTablaHelp = new RegExp ("^Condicion_tabla[0-9]+$")
 
 // Variables ocultar tabla
-var valor = false
+var valor = true
 var valor1 = true
 var valor2 = false
 var valor3 = false
@@ -35,6 +35,8 @@ const principal = async () => {
     var cadena = otro.split(" ");
     const stack = new Stack();        
     var numero = 0
+    $('#Imprimir')[0].disabled = true;
+    $('#Limpiar')[0].disabled = true;
     var noTerminales = ['function', '(', ')', 'var', ':', 'a...z', 'integer', 'real','boolean', 'string', ';', '$'] 
     var Terminales = ['S','Tipo_Join','Resto_Join','Campos_Mostrar','Ops','Mas','Columna','Complemento','Restos_Varios','Tablas_Join','TablaO','Mas_datos','Apartado_Condicion','Tablas_Cruza', 'Ons', 'Mas_datas','Campos_where', 'Opciones', 'Contenido','Simbolos','Resto_Digito','Comparadores','Mas_Where','Operadores','Campo_order','Letra','Digito','Cols']
     var reglas = [
@@ -74,6 +76,7 @@ const principal = async () => {
     m = 1
     f = 1
     k = 1
+    z = 0
     var pasa_campos = false; var pasa_dos_puntos = false; var pasa_columna = false ;
     var son_campos = false; var es_campo = false; var termina = false; var pasa_coma = false;
     var pasa_tabla = false; var pasa_corchete_ini = false; var pasa_dos_puntos1 = false; var pasa_evalTablas = false
@@ -107,14 +110,17 @@ const principal = async () => {
         }
         cadena.forEach(element => {
             if(element == "\n" || element == ""){
-                pos.push(n) 
+                pos.push(n)
+                if(hay_error == false){
+                    z += 1
+                }
             }
             if(cadena[n] != "\n" ){
                 if(errores.test(element)){
                     error.push(element)                    
                 }else{
                     if(hay_error == false){                        
-                        
+                        z += 1
                         numero += 1
                         if(termina == false){
                             Terminales.forEach(datas => {
@@ -436,7 +442,10 @@ const principal = async () => {
                                     if(cadena[contador + 2] == 'Condicion_order'){
                                         pasa_condicionOrder = true
                                     }else{
-                                        if(cadena[contador + 1] == '}' || cadena[contador + 2] =='}'){
+                                        console.log(cadena[contador + 1]);
+                                        if(cadena[contador + 1] == '}'){
+                                            console.log(numero,".- Se extrae → ", stack.peek() ,' - Variables → ', element)
+                                            stack.pop()
                                             console.log(numero,".- Se extrae → ", stack.peek() ,' - Variables → ', element)
                                             stack.pop()
                                             termina = true
@@ -566,11 +575,10 @@ const principal = async () => {
                                     hay_error = true
                                 }
                             }
-                        }else{
-                            
-                            console.log('Hubo algun caracter erroneo');                            
+                        }else{                                                        
                             hay_error = true
                             if (cadena[n] != "") {
+                                console.log('Hubo algun caracter erroneo');
                                 error.push(element)
                             }                        
                         }                                                
@@ -580,33 +588,38 @@ const principal = async () => {
             }
             contador += 1
             n += 1
-        });
-        //console.log(pos);
+        });                
         if(stack.peek() == '$'){
             if (valor2 == false) {                        
                 div1.style.display = '';
-            }            
+            }
+            impresionSentenciaSQL(arreglo_columnas,arreglo_joins, arreglo_tablas, arreglo_condicionOn,arreglo_where,arreglo_orderBy)
         }else if(hay_error == true){
+            console.log('error →', z  , ' ', cadena[z ]);
             stack.push('¡ERROR!')
+            var uno = document.getElementById('invalido');
+            valor2?uno.innerText = "En algun punto ha sido erronea la cadenas":uno.innerText = "Se encotro un error en la cadena → " + cadena[z] ;
             if (valor2 == false) {        
                 div = document.getElementById('invalido');
                 div.style.display = '';
             }
         }
         console.log(numero, " Se quedo pila →", stack.print());
-        impresionTablaPila('pila', stack, 0 , numero)
-        console.log('Select',arreglo_columnas, 'From',arreglo_tablas[0],arreglo_joins,arreglo_tablas[1],'On',arreglo_condicionOn[0],'=',arreglo_condicionOn[1],'where',arreglo_where,'Order by',arreglo_orderBy);
-        
-    }else{        
+        impresionTablaPila('pila', stack, 0 , numero)                
+    }else{
+        var uno = document.getElementById('invalido');
         valor2?uno.innerText = "En algun punto ha sido erronea la cadenas":uno.innerText = "Mete alguna cadena valida";
         if (valor2 == false) {
             div.style.display = '';            
         }
     }
-    impresionTabla(reservada,tabla, signo, var_cadena, simbolo, valor, error, columna, comparacion)
+    impresionTabla(reservada,tabla, signo, var_cadena, simbolo, valor, error, columna, comparacion)    
     await delay(7000);
     div.style.display = 'none';
     div1.style.display = 'none';
+    $('#Imprimir')[0].disabled = false;
+    $('#Limpiar')[0].disabled = false;        
+
 }
 
 function pilaActualizar(datas, rules, stack, cadena, numero) {    
@@ -709,7 +722,7 @@ const basedeDatos = async () => {
             tres.style.display = 'none'
             cuatro.style.display = ''
             seis.innerText = baseDatos
-            cinco.style.display = ''
+            cinco.style.display = ''            
         }else{
             
             valor4?uno.innerText = "Introduce una base de datos":uno.innerText = "No se aceptan errores como: " + info_input;
@@ -725,7 +738,7 @@ const tablasBase= async () => {
     var uno = document.getElementById('advertencia1');
     var dos = document.getElementById('tabla');
     if(info_input != ''){
-        if (baseTablas.test(info_input)) {
+        if (baseTablas.test(info_input) && tablasBaseDatos.includes(info_input) == false) {
             $('#boton1')[0].disabled = true;
             $('#tabla')[0].disabled = true;
             var dato = info_input
@@ -742,11 +755,15 @@ const tablasBase= async () => {
             $('#boton1')[0].disabled = false;
             $('#tabla')[0].disabled = false;
         }else{
-            
-            valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "No se aceptan errores como: " + info_input;
-            await delay(3000);
-            valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "Introduce una Tabla correctamente";
-            
+            if(tablasBaseDatos.includes(info_input)){
+                valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "La tabla → " + info_input +" no se puede repetir, favor de meter otra tabla";
+                await delay(3000);
+                valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "Introduce una Tabla correctamente";
+            }else{
+                valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "No se aceptan errores como: " + info_input;
+                await delay(3000);
+                valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "Introduce una Tabla correctamente";
+            }                        
         }
     }
 }
@@ -790,24 +807,35 @@ function mostrar_tabla1() {
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 const mostrarpantalla = async () => {
-    if(tablasBaseDatos.length >= 1 && baseDatos != ''){
+    console.log(tablasBaseDatos);
+    document.getElementById('tablasNo1').innerHTML = '';    
+    if(tablasBaseDatos.length >= 2 && baseDatos != ''){        
         var elemento = document.getElementById("card");
         elemento.style.display = 'none';
         var elemento = document.getElementById("formu");
         elemento.style.display = 'block';   
+        var seis = document.getElementById("titleba")
+        seis.innerText = baseDatos        
+        m = 1
+        tablasBaseDatos.sort()
+        tablasBaseDatos.forEach(element => {
+                var dato = element                
+                    var btn =  document.createElement("li"); btn.innerHTML = dato; document.getElementById("tablasNo1").appendChild(btn);                
+            });
     }
     else{
         var uno = document.getElementById('invalidoTablaBaseDatos');
         div = document.getElementById('invalidoTablaBaseDatos');
         if (valor2 == false) {
             if(tablasBaseDatos.length == 0 && baseDatos == ''){
-                valor2?uno.innerText = "introduce":uno.innerText = "Introduce alguna Base de datos y algunas columnas";
+                valor2?uno.innerText = "introduce":uno.innerText = "Introduce alguna Base de datos y algunas Tablas";
             }else{
+
                 if(tablasBaseDatos.length == 0){
-                    valor2?uno.innerText = "introduce":uno.innerText = "Introduce algunas columnas";
+                    valor2?uno.innerText = "introduce":uno.innerText = "Introduce algunas Tablas";
                 }
                 if(tablasBaseDatos.length == 1){
-                    valor2?uno.innerText = "introduce":uno.innerText = "Introduce mas de una columna";
+                    valor2?uno.innerText = "introduce":uno.innerText = "Introduce mas de una Tabla";
                 }
                 if(baseDatos == ''){
                     valor2?uno.innerText = "introduce":uno.innerText = "Introduce una base de datos";
@@ -818,6 +846,342 @@ const mostrarpantalla = async () => {
         await delay(5000);
         div.style.display = 'none';
     }
+}
+
+function agregaryeliminar() {
+    console.log(tablasBaseDatos);
+    document.getElementById('tablasN').innerHTML = '';
+    var elemento = document.getElementById("card");
+    elemento.style.display = 'block';
+    var elemento = document.getElementById("formu");
+    elemento.style.display = 'none';   
+    var tres = document.getElementById("nombreBaseDatos");
+    var cuatro = document.getElementById("nombreTablas");
+    var cinco = document.getElementById("BaseCompleta")
+    var seis = document.getElementById("boton2")
+    var uno = document.getElementById('advertencia1');
+    valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "Introduce o Elimina una Tabla" ;
+    tres.style.display = 'none'
+    cuatro.style.display = 'block'
+    cinco.style.display = 'block'
+    seis.style.display = 'block'
+    tablasBaseDatos.sort()
+    tablasBaseDatos.forEach(element => {
+        var dato = element
+        var btn =  document.createElement("li"); btn.innerHTML = dato; document.getElementById("tablasN").appendChild(btn);
+    });           
+}
+
+var punto = new RegExp("[.]")
+var numero = new RegExp("^[0-9]+$")
+const impresionSentenciaSQL = async (arreglo_columnas,arreglo_joins, arreglo_tablas, arreglo_condicionOn,arreglo_where,arreglo_orderBy) => {
+    console.log('Select',arreglo_columnas, 'From',arreglo_tablas[0],arreglo_joins,arreglo_tablas[1],'On',arreglo_condicionOn[0],'=',arreglo_condicionOn[1],'where',arreglo_where,'Order by',arreglo_orderBy);    
+    var where = ''
+    var uno = document.getElementById('advertenciaSQL');
+    arreglo_where.forEach(element => {
+        where += element + ' '
+    });
+    
+    var errores = []
+    var errors = 0    
+    console.log('←←←←←←←←←← Columnas →→→→→→→→→→');
+    arreglo_columnas.forEach(element => {
+        var hay_error = false
+        if (hay_error == false) {
+            if (punto.test(element)) {
+                var hay_punto = false
+                var tabla = ''
+                for (let i = 0; i < element.length; i++) {
+                    if(hay_punto == true){
+                        tabla += element[i]
+                    }
+                    if (hay_punto == false) {
+                        if(element[i] == '.'){
+                            hay_punto = true
+                        }
+                    }
+                }
+                if(tablasBaseDatos.includes(tabla) == false){
+                    errores.push(tabla)
+                    hay_error == true
+                    errors += 1
+                }else{
+                    if(tabla == arreglo_tablas[0] || tabla == arreglo_tablas[1]){
+                        console.log(element);
+                    }else{
+                        errores.push(tabla)
+                        hay_error == true
+                        errors += 1
+                    }
+                }
+            }else{
+                console.log(element);
+            }
+        }
+    });
+    console.log('←←←←←←←←←← Tablas →→→→→→→→→→');
+    arreglo_tablas.forEach(element => {        
+        var hay_error = false
+        if(hay_error == false){
+            if(tablasBaseDatos.includes(element) == false){
+                hay_error = true
+                errors += 1
+                errores.push(element)
+            }else{
+                console.log(element);
+            }
+        }
+    });
+    console.log('←←←←←←←←←← Condiciones On →→→→→→→→→→');
+    var tab = []
+    arreglo_condicionOn.forEach(element => {
+        var hay_error = false
+        if (hay_error == false) {
+            if (punto.test(element)) {
+                var hay_punto = false
+                var tabla = ''
+                for (let i = 0; i < element.length; i++) {
+                    if(hay_punto == true){
+                        tabla += element[i]
+                    }
+                    if (hay_punto == false) {
+                        if(element[i] == '.'){
+                            hay_punto = true
+                        }
+                    }
+                }
+                if(tablasBaseDatos.includes(tabla) == false){
+                    errores.push(tabla)
+                    hay_error == true
+                    errors += 1
+                }else{
+                    console.log(element);
+                    tab.push(tabla)
+                }
+            }
+        }        
+    });
+    console.log(tab);
+    if (tab[0] == arreglo_tablas[0] && tab[1] == arreglo_tablas[1]) {
+        console.log('estan en la misma posicion');
+    }else{
+        errors += 1
+        console.log('no estan en la misma posicion');
+    }    
+    console.log('←←←←←←←←←← Condiciones where →→→→→→→→→→');
+    var variable = false
+    var comparacion = false
+    var valoresN = false
+    var opderador = false
+    con = 0
+    arreglo_where.forEach(element => {
+        var hay_error = false
+        if (hay_error == false) {
+            if(opderador == true){
+                opderador = false
+                console.log('operador →', element);                
+            }
+            if(valoresN == true){
+                valoresN = false                
+                if(arreglo_where[con - 1] == '<>' || arreglo_where[con - 1] == '='){
+                    console.log('valor →', element);
+                }else{
+                    if(numero.test(element)){
+                        console.log('valor →', element);
+                    }else{
+                        errores.push(element)
+                        hay_error == true
+                        errors += 1
+                    }
+                }
+                opderador = true
+            }        
+            if(comparacion == true) {
+                comparacion = false
+                console.log('comparacion → ', element);
+                valoresN = true
+            }            
+            if(columnas.test(element) && valoresN == false){
+                if(element == 'and' || element == 'or'){                    
+                }else{
+                    if (punto.test(element)) {
+                        var hay_punto = false
+                        var tabla = ''
+                        for (let i = 0; i < element.length; i++) {
+                            if(hay_punto == true){
+                                tabla += element[i]
+                            }
+                            if (hay_punto == false) {
+                                if(element[i] == '.'){
+                                    hay_punto = true
+                                }
+                            }
+                        }
+                        if(tablasBaseDatos.includes(tabla) == false){
+                            errores.push(tabla)
+                            hay_error == true
+                            errors += 1
+                        }else{
+                            if(tabla == arreglo_tablas[0] || tabla == arreglo_tablas[1]){
+                                console.log(element);
+                            }else{
+                                errores.push(tabla)
+                                hay_error == true
+                                errors += 1
+                            }
+                        }
+                    }else{
+                        console.log(element);
+                    }                    
+                    comparacion = true
+                }
+
+            }
+            con += 1
+        }        
+    });
+
+    console.log('←←←←←←←←←← Condiciones Order by →→→→→→→→→→');    
+    arreglo_orderBy.forEach(element => {
+        var hay_error = false
+        if (hay_error == false) {
+            if (punto.test(element)) {
+                var hay_punto = false
+                var tabla = ''
+                for (let i = 0; i < element.length; i++) {
+                    if(hay_punto == true){
+                        tabla += element[i]
+                    }
+                    if (hay_punto == false) {
+                        if(element[i] == '.'){
+                            hay_punto = true
+                        }
+                    }
+                }
+                if(tablasBaseDatos.includes(tabla) == false){
+                    errores.push(tabla)
+                    hay_error == true
+                    errors += 1
+                }else{
+                    console.log(element);
+                }
+            }
+        }        
+    });
+    console.log('←←←←←←←←←← Fin →→→→→→→→→→');
+    var tres = document.getElementById('advertenciaSQL');
+    var dos = document.getElementById('sentenciaSQL');
+    if(arreglo_where.length > 0 && arreglo_orderBy.length > 0){
+        document.getElementById("sentenciaSQL").value = 'Select ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] + ' Where ' + where + ' Order by ' + arreglo_orderBy;
+    }else{
+        if (arreglo_where.length == 0) {
+            document.getElementById("sentenciaSQL").value = 'Select ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] +  ' Order by ' + arreglo_orderBy;
+        }
+        if (arreglo_orderBy.length == 0) {
+            document.getElementById("sentenciaSQL").value = 'Select ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] + ' Where ' + where;
+        }
+        if(arreglo_where.length == 0 && arreglo_orderBy.length == 0){
+            document.getElementById("sentenciaSQL").value = 'Select ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] 
+        }
+    }
+    if(errors >= 1){
+        tres.className = 'invalid-feedback' 
+        dos.className =  'form-control is-invalid'
+        console.log('Hay errores en tu sentencia →', errores);        
+        valor5?uno.innerText = "Esperando sentencia Join":uno.innerText = "Tienes errores en algunas Tablas  →" + errores;
+    }else{        
+        tres.className = 'valid-feedback' 
+        dos.className =  'form-control is-valid'
+        valor5?uno.innerText = "Esperando sentencia Join":uno.innerText = "La sentencia es correcta";
+        console.log('La sentencia se puede imprimir ');
+        createFile = []
+        createFile.push('import mysql.connector \n\n')
+        createFile.push('mydb = mysql.connector.connect( \n\n')
+        createFile.push('   host= "localhost", \n')
+        createFile.push('   user= "tu usuario",\n')
+        createFile.push('   passwd= "tu contraseña",\n')
+        createFile.push('   database= "tu_bbdd"\n')
+        createFile.push(' )\n\n')
+
+        createFile.push('mycursor = mydb.cursor()\n\n')
+
+        createFile.push('sql =  "SELECT ' + '\n')
+        createFile.push(arreglo_columnas + '\n')    
+        createFile.push('   FROM ' + arreglo_tablas[0] + '\n')
+        createFile.push('   ' + String.prototype.toUpperCase(arreglo_joins[0]) +' JOIN ' + arreglo_tablas[1] + ' ON clientes.fav = producto.id \n')
+        if(arreglo_where.length > 0 && arreglo_orderBy.length > 0){
+            createFile.push(' WHERE ' + where + ' ORDER BY ' + arreglo_orderBy + '\n');
+        }else{
+            if (arreglo_where.length == 0) {
+                createFile.push(' ORDER BY ' + arreglo_orderBy + '\n');
+            }
+            if (arreglo_orderBy.length == 0) {
+                createFile.push(' WHERE ' + where + '\n');
+            }
+            if(arreglo_where.length == 0 && arreglo_orderBy.length == 0){                
+            }
+        }
+        createFile.push('" \n\n')
+        createFile.push('mycursor.execute(sql) \n\n')
+        createFile.push('myresult = mycursor.fetchall() \n\n')
+        createFile.push('for x in myresult: \n\n')
+        createFile.push('    print(x)\n\n')        
+        $('#staticBackdrop').modal({
+            keyboard: false
+          })
+        var cuatro = document.getElementById('butDescarga');
+        cuatro.style.display = ''
+        var cuatro = document.getElementById('descargaTitle');
+        valor5?cuatro.innerText = "El programa te genero un archivo de python con el titulo":cuatro.innerText = "El programa te genero un archivo de python con el titulo → " + arreglo_tablas[0]+arreglo_tablas[1]+'.py'  ;
+    }
+    //descargarArchivo(generarTexto(createFile), arreglo_tablas[0]+arreglo_tablas[1]+'.py');
+}
+
+const eliminarTablasBase = async () => {
+    var info_input= document.getElementById("tabla").value;
+    var uno = document.getElementById('advertencia1');
+    var dos = document.getElementById('tabla');
+    if(info_input != ''){
+        if (baseTablas.test(info_input) && tablasBaseDatos.includes(info_input)) {
+            $('#boton1')[0].disabled = true;
+            $('#tabla')[0].disabled = true;
+            $('#boton2')[0].disabled = true;
+            var index = tablasBaseDatos.indexOf(info_input)
+            if (index > -1) {
+                tablasBaseDatos.splice(index, 1);
+             }
+            document.getElementById('tablasN').innerHTML = '';
+            tablasBaseDatos.sort()
+            tablasBaseDatos.forEach(element => {
+                var dato = element
+                var btn =  document.createElement("li"); btn.innerHTML = dato; document.getElementById("tablasN").appendChild(btn);
+            });
+            
+            dos.className = 'form-control is-valid'
+            uno.className= 'valid-feedback'
+            valor5?uno.innerText = "Introduce una Tabla":uno.innerText = " Eliminado correctamente" ;
+            
+            await delay(2000);
+            dos.className = 'form-control is-invalid'
+            uno.className= 'invalid-feedback'
+            valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "Introduce o Elimina una Tabla" ;
+            document.getElementById("tabla").value = "";
+            $('#boton1')[0].disabled = false;
+            $('#tabla')[0].disabled = false;
+            $('#boton2')[0].disabled = false;
+        }else{
+            if(tablasBaseDatos.includes(info_input) == false  && baseTablas.test(info_input)) {
+                valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "La tabla → " + info_input +" no existe, favor de meter otra tabla";
+                await delay(3000);
+                valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "Introduce o Elimina una Tabla" ;
+            }else{
+                valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "No se aceptan errores como: " + info_input;
+                await delay(3000);
+                valor5?uno.innerText = "Introduce una Tabla":uno.innerText = "Introduce o Elimina una Tabla" ;
+            }                        
+        }
+    }
+
 }
 
 class Stack {
@@ -845,4 +1209,41 @@ class Stack {
     print() {
       return this.stack
     }
-}  
+}
+
+function descargarArchivo(contenidoEnBlob, nombreArchivo) {
+    var reader = new FileReader();
+    reader.onload = function (event) {
+        var save = document.createElement('a');
+        save.href = event.target.result;
+        save.target = '_blank';
+        save.download = nombreArchivo || 'archivo.dat';
+        var clicEvent = new MouseEvent('click', {
+            'view': window,
+                'bubbles': true,
+                'cancelable': true
+        });
+        save.dispatchEvent(clicEvent);
+        (window.URL || window.webkitURL).revokeObjectURL(save.href);
+    };
+    reader.readAsDataURL(contenidoEnBlob);
+};
+
+//Genera un objeto Blob con los datos en un archivo TXT
+function generarTexto(createFile) {
+        
+    //El contructor de Blob requiere un Array en el primer parámetro
+    //así que no es necesario usar toString. el segundo parámetro
+    //es el tipo MIME del archivo
+    return new Blob(createFile, {
+        type: 'text/plain'
+    });
+};
+
+function descargarpy() {
+    descargarArchivo(generarTexto(createFile), arreglo_tablas[0]+arreglo_tablas[1]+'.py');
+}
+
+function cargarCadena() {
+    document.getElementById("exampleFormControlTextarea1").value = "inner join \nCampos_muestra { \nCampos : *.Producto \n Campo1 : id_producto.Ventas \n Campo2 : id \n Campo3 : nombre.Producto } , \n Tablas { \n Tabla1 : Producto \n Tabla2 : Ventas } , \n Condiciones { \n On { \n CondicionOn1 : id.Producto \n CondicionOn2 : id_Productos.Ventas } , \n Where { \n Condicion_tabla1 : id.Producto = 'hola' \n Condicion_operador : and \n Condicion_tabla2 : fecha = '12-12-2020' } , \n Order_by { \n Condicion_order : id.Producto } } ";
+}

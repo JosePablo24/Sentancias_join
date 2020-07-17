@@ -43,7 +43,7 @@ Campos : *.Producto
  Campo2 : id 
  Campo3 : nombre.Producto } , 
  Tablas { 
- Tabla1 : Productos 
+ Tabla1 : Producto 
  Tabla2 : Ventas } , 
  Condiciones { 
  On { 
@@ -54,4 +54,4 @@ Campos : *.Producto
  Condicion_operador : and 
  Condicion_tabla2 : fecha = '12-12-2020' } , 
  Order_by { 
- Condicion_order : id.Productos } } 
+ Condicion_order : id.Producto } } 

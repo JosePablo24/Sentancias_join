@@ -10,12 +10,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>    
     <title>Automatas</title>
-    <script src="index.js"></script>
+    <script  src="index.js"></script>
 </head>
 <body>
     <div class="card" style="align-content: center;" style="width: 50rem;" id="card">    
       <div class="card-body">
-        <h2 class="card-title">Aplicacion para definir la estructura de una sentencia join</h2>
+        <h2 class="card-title">Generador de sentencias join</h2>
         <p class="card-text">Esta Aplicacion te permitira obtener una referencia de como debe ser tu sentencia join de acuerdo a las tablas propuestas en esta pantalla</p>
             <div id="nombreBaseDatos">
                       <label>Base de datos</label>
@@ -32,7 +32,8 @@
               <div class="invalid-feedback" id="advertencia1">
                 Introduce una Tabla
               </div>
-              <button type="submit" class="btn btn-primary mb-2" onclick="tablasBase()" id="boton1">Entendido</button>
+              <button type="submit" class="btn btn-primary mb-2" onclick="tablasBase()" id="boton1">Agregar</button>
+              <button type="submit" class="btn btn-danger mb-2" onclick="eliminarTablasBase()" id="boton2" style="display: none;">Eliminar</button>
             </div>
             <div id="BaseCompleta" style="display: none;">
               <div class="" style="width: 18rem;">
@@ -54,12 +55,15 @@
       </div>
     </div>
     
-    <div class="card" style="align-content: center; display: none" style="width: 50rem; display: none;" id="formu">
+    <div class="card" style="align-content: center; display: none" style="width: 40rem; display: none;" id="formu">
       <h2>Productor de Sentencias join </h2>
       <form name="formularioLSG">
           <div class="form-group" >
-              <label for="exampleFormControlTextarea1">Gramatica</label>
-              <textarea  class="form-control" id="exampleFormControlTextarea1" rows="6" style="resize: none" placeholder=" ingresa tu cadena aqui 
+            <div class="row">
+              <div class="col">
+                  <label for="exampleFormControlTextarea1">Cadena a ingresar</label>
+                  <button type="button" class="btn btn-link" data-toggle="modal" data-target="#staticBackdrop1" >Ejemplo de cadena</button>                  
+                  <textarea  class="form-control" id="exampleFormControlTextarea1" rows="9"  style="resize: none" placeholder=" ingresa tu cadena aqui 
               ejemplo :
               inner join
 Campos_Muestra { 
@@ -86,31 +90,97 @@ Condiciones {
     } 
 }
 
-              ">inner join 
-Campos_muestra { 
-Campos : *.Producto 
- Campo1 : id_producto.Ventas 
- Campo2 : id 
- Campo3 : nombre.Producto } , 
- Tablas { 
- Tabla1 : Productos 
- Tabla2 : Ventas } , 
- Condiciones { 
- On { 
- CondicionOn1 : id.Producto 
- CondicionOn2 : id_Productos.Ventas } , 
- Where { 
- Condicion_tabla1 : id.Producto = 'hola' 
- Condicion_operador : and 
- Condicion_tabla2 : fecha = '12-12-2020' } , 
- Order_by { 
- Condicion_order : id.Productos } } </textarea>
+              "></textarea>
+              </div>
+            <div class="col">              
+              <div class="card text-white bg-secondary mb-3" >
+                <div class="card-header">
+                  <div class="row">
+                    <div class="col">
+                      <h5  id="titleba">Farmacia</h5>                  
+                    </div>                                    
+                    <div class="col" style="text-align: right;">
+                      <button type="button" class="btn btn-warning" id="AgregaryEliminar" onclick="agregaryeliminar()">Agregar o Eliminar</button>                  
+                    </div>
+                  </div>
+                </div>
+                <div class="card-body">                  
+                  <h6 class="card-subtitle mb-2 text-white">Tablas</h6>
+                  <div >
+                    <ul  id="tablasNo1">                      
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>  
           </div>
-          <button type="button" class="btn btn-primary" onclick="principal()">Imprimir</button>
-          <button type="button" class="btn btn-primary" onclick="limpiar()">Limpiar</button>
-          <button type="button" class="btn btn-primary" id="mostrar" onclick="mostrar_tabla()">Ocultar Tabla Token's</button>
-          <button type="button" class="btn btn-primary" id="mostrar1" onclick="mostrar_tabla1()">Mostrar Tabla Pila</button>
-      </form>        
+          <br>
+          <button type="button" class="btn btn-primary" id="Imprimir" onclick="principal()">Imprimir</button>
+          <button type="button" class="btn btn-success" id="Limpiar" onclick="limpiar()">Limpiar</button>
+          <button type="button" class="btn btn-secondary" id="mostrar" onclick="mostrar_tabla()">Mostrar Tabla Token's</button>
+          <button type="button" class="btn btn-info" id="mostrar1" onclick="mostrar_tabla1()">Mostrar Tabla Pila</button>
+          <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop" id="butDescarga" style="display: none;">Descargar Archivo</button> 
+      </form>
+            <!-- Button trigger modal -->
+      
+
+      <!-- Modal -->
+      <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Deseas descargar este archivo</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body" id="descargaTitle">
+              El programa te genero un archivo de python con el titulo
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+              <button type="button" class="btn btn-primary" id="descargarArchivo" onclick="descargarpy()">Descargar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" id="staticBackdrop1" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true" >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="staticBackdropLabel">Ejemplo de Cadena</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">inner join&nbsp;<br>
+Campos_muestra {&nbsp;<br>
+Campos : *.Producto&nbsp;<br>
+&nbsp;Campo1 : id_producto.Ventas&nbsp;<br>
+&nbsp;Campo2 : id&nbsp;<br>
+&nbsp;Campo3 : nombre.Producto } ,&nbsp;<br>
+&nbsp;Tablas {&nbsp;<br>
+&nbsp;Tabla1 : Producto&nbsp;<br>
+&nbsp;Tabla2 : Ventas } ,&nbsp;<br>
+&nbsp;Condiciones {&nbsp;<br>
+&nbsp;On {&nbsp;<br>
+&nbsp;CondicionOn1 : id.Producto&nbsp;<br>
+&nbsp;CondicionOn2 : id_Productos.Ventas } ,&nbsp;<br>
+&nbsp;Where { <br>
+&nbsp;Condicion_tabla1 : id.Producto = 'hola'&nbsp;<br>
+&nbsp;Condicion_operador : and&nbsp;<br>
+&nbsp;Condicion_tabla2 : fecha = '12-12-2020' } ,&nbsp;<br>
+&nbsp;Order_by {&nbsp;<br>
+&nbsp;Condicion_order : id.Producto } }&nbsp;</div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+              <button type="button" class="btn btn-primary" id="cargar" onclick="cargarCadena()">Cargar ejemplo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <br>
+      <br>
       <div class="alert alert-success" role="alert" role="alert" role="alert" style="display:none" id="valido">
         Tu cadena ha sido encontrada como valida 
       </div>
@@ -118,8 +188,14 @@ Campos : *.Producto
         En algun punto ha sido erronea la cadenas
       </div>
       <br>
-      <h1 id="titulo_tokens">Tabla Token's</h1>
-      <div id="datos_tabla" > <!--style="display: none">-->
+      <h1 id="sentencia" >Sentencia</h1>
+      <textarea rows="3" class="form-control is-invalid" id="sentenciaSQL" style="resize: none" disabled></textarea>
+              <div class="invalid-feedback" id="advertenciaSQL">
+                Esperando sentencia Join
+              </div>
+      <br>
+      <h1 id="titulo_tokens" style="display: none;">Tabla Token's</h1>
+      <div id="datos_tabla" style="display: none">
               <form>
                   <table class="table table-hover" >                
                   <thead>
