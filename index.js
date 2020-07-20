@@ -701,7 +701,7 @@ function limpiar() {
     document.getElementById('tablita1').innerHTML = '';
     document.getElementById("exampleFormControlTextarea1").value = "";    
 }
-var baseTablas = new RegExp("^[A-Z]?[a-z]+[0-9]*_?[a-z]*[0-9]*$")
+var baseTablas = new RegExp("^[A-Z][a-z]+[0-9]*_?[a-z]*[0-9]*$")
 const basedeDatos = async () => {
     var info_input= document.getElementById("base").value;
     var uno = document.getElementById('advertencia');
@@ -1072,16 +1072,16 @@ const impresionSentenciaSQL = async (arreglo_columnas,arreglo_joins, arreglo_tab
     var tres = document.getElementById('advertenciaSQL');
     var dos = document.getElementById('sentenciaSQL');
     if(arreglo_where.length > 0 && arreglo_orderBy.length > 0){
-        document.getElementById("sentenciaSQL").value = 'Select ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] + ' Where ' + where + ' Order by ' + arreglo_orderBy;
+        document.getElementById("sentenciaSQL").value = 'Use ' + baseDatos+ '\nSelect ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] + ' Where ' + where + ' Order by ' + arreglo_orderBy;
     }else{
         if (arreglo_where.length == 0) {
-            document.getElementById("sentenciaSQL").value = 'Select ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] +  ' Order by ' + arreglo_orderBy;
+            document.getElementById("sentenciaSQL").value = 'Use ' + baseDatos+ '\nSelect ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] +  ' Order by ' + arreglo_orderBy;
         }
         if (arreglo_orderBy.length == 0) {
-            document.getElementById("sentenciaSQL").value = 'Select ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] + ' Where ' + where;
+            document.getElementById("sentenciaSQL").value = 'Use ' + baseDatos+ '\nSelect ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] + ' Where ' + where;
         }
         if(arreglo_where.length == 0 && arreglo_orderBy.length == 0){
-            document.getElementById("sentenciaSQL").value = 'Select ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] 
+            document.getElementById("sentenciaSQL").value = 'Use ' + baseDatos+ '\nSelect ' + arreglo_columnas + ' From ' + arreglo_tablas[0] + ' ' + arreglo_joins[0] + ' join ' + arreglo_tablas[1] + ' On ' + arreglo_condicionOn[0] + ' = ' + arreglo_condicionOn[1] 
         }
     }
     if(errors >= 1){
@@ -1108,18 +1108,22 @@ const impresionSentenciaSQL = async (arreglo_columnas,arreglo_joins, arreglo_tab
         createFile.push('sql =  "SELECT \\' + '\n')
         createFile.push(arreglo_columnas + '\\\n')    
         createFile.push('   FROM ' + arreglo_tablas[0] + '\\\n')
-        createFile.push('   ' + String.prototype.toUpperCase(arreglo_joins[0]) +' JOIN ' + arreglo_tablas[1] + ' ON clientes.fav = producto.id \\\n')
+        createFile.push('   ' + arreglo_joins[0] +' JOIN ' + arreglo_tablas[1] + ' ON ' + arreglo_condicionOn[0] + ' = ' +  arreglo_condicionOn[1] + '\\\n')
         if(arreglo_where.length > 0 && arreglo_orderBy.length > 0){
+            console.log('aqui entro');
             createFile.push(' WHERE ' + where + ' ORDER BY ' + arreglo_orderBy + '\\\n');
         }else{
-            if (arreglo_where.length == 0) {
-                createFile.push(' ORDER BY ' + arreglo_orderBy + '\\\n');
-            }
-            if (arreglo_orderBy.length == 0) {
-                createFile.push(' WHERE ' + where + '\\\n');
-            }
             if(arreglo_where.length == 0 && arreglo_orderBy.length == 0){                
-            }
+            }else{
+                if (arreglo_where.length == 0) {
+                    console.log('aqui entro1');
+                    createFile.push(' ORDER BY ' + arreglo_orderBy + '\\\n');
+                }
+                if (arreglo_orderBy.length == 0) {
+                    console.log('aqui entro2');
+                    createFile.push(' WHERE ' + where + '\\\n');
+                }  
+            }                      
         }
         createFile.push('" \n\n')
         createFile.push('mycursor.execute(sql) \n\n')
