@@ -10,8 +10,8 @@ var columnas = new RegExp ("^[a-z]+_*[0-9]*[a-z]*$|^[a-z]+_?[A-Z]?[a-z]+[.][A-Z]
 var errores = new RegExp(">>+|=+>+|<<+=+|><|<<+|==+")//|{}|&&&+|^[&]$|^[!]$|^\"$|^'$|#|[$]|[%]|[?]|[¡]|^=$|[+]|;|[°]|[|]|[\[]|\]|¬|^_$|-|[~]|¨|`|\\\\|\\\^|@|^\"+$|^'+$|[)]+\"+|,,+|[)][)]+|[(][(]+|{{+|}}+|''+")//
 var errores_Letra = new RegExp ("[a-z]+[-]+|[a-z]+[(]+")//|[a-z]+_?[/]+|[a-z]+_?{+}+|[a-z]+_?[)]+|[a-z]+_?{$}+|[a-z]+_?%+|[a-z]+_?[-]+|[a-z]+_?=+|[a-z]+_?<+|[a-z]+_?>+|[a-z]+_?&+|^[1-9]+[a-z]+_?|^[)]+[a-z]+|^[(]+[a-z]+|^[{]+[a-z]+|^[}]+[a-z]+")//|^\"+[a-z]+[0-9]*$|^[a-z]+\"+|^>+[a-z]+|[a-z]+,+|[a-z]+[.]+")
 var errores_Num = new RegExp ("[0-9]+_?|0-9]+_?[(]+|[0-9]+_?[/]+")//|[0-9]+_?{+}+|[0-9]+_?[)]+|[0-9]+_?{$}+|[0-9]+_?%+|[0-9]+_?[-]+|[0-9]+_?=+|[0-9]+_?<+|[0-9]+_?>+|[0-9]+_?&+|^[)]+[0-9]+|^[(]+[0-9]+|^[{]+[0-9]+|^[}]+[0-9]+|^\"+[0-9]+[a-z]*$|[0-9]+_+$|^[0-9]+\"+$")//|[0-9]+_+[0-9]+|<+[0-9]+|>+[0-9]+|[0-9]+!+")
-var baseDatos = 'Pet'
-var tablasBaseDatos = ['Ventas', 'Producto']
+var baseDatos = ''
+var tablasBaseDatos = []
 
 // Auxiliares para sacar pila
 var camposHelp =  new RegExp ("^Campos$|^Campo[0-9]+$")
@@ -1105,18 +1105,18 @@ const impresionSentenciaSQL = async (arreglo_columnas,arreglo_joins, arreglo_tab
 
         createFile.push('mycursor = mydb.cursor()\n\n')
 
-        createFile.push('sql =  "SELECT ' + '\n')
-        createFile.push(arreglo_columnas + '\n')    
-        createFile.push('   FROM ' + arreglo_tablas[0] + '\n')
-        createFile.push('   ' + String.prototype.toUpperCase(arreglo_joins[0]) +' JOIN ' + arreglo_tablas[1] + ' ON clientes.fav = producto.id \n')
+        createFile.push('sql =  "SELECT \\' + '\n')
+        createFile.push(arreglo_columnas + '\\\n')    
+        createFile.push('   FROM ' + arreglo_tablas[0] + '\\\n')
+        createFile.push('   ' + String.prototype.toUpperCase(arreglo_joins[0]) +' JOIN ' + arreglo_tablas[1] + ' ON clientes.fav = producto.id \\\n')
         if(arreglo_where.length > 0 && arreglo_orderBy.length > 0){
-            createFile.push(' WHERE ' + where + ' ORDER BY ' + arreglo_orderBy + '\n');
+            createFile.push(' WHERE ' + where + ' ORDER BY ' + arreglo_orderBy + '\\\n');
         }else{
             if (arreglo_where.length == 0) {
-                createFile.push(' ORDER BY ' + arreglo_orderBy + '\n');
+                createFile.push(' ORDER BY ' + arreglo_orderBy + '\\\n');
             }
             if (arreglo_orderBy.length == 0) {
-                createFile.push(' WHERE ' + where + '\n');
+                createFile.push(' WHERE ' + where + '\\\n');
             }
             if(arreglo_where.length == 0 && arreglo_orderBy.length == 0){                
             }
@@ -1124,7 +1124,7 @@ const impresionSentenciaSQL = async (arreglo_columnas,arreglo_joins, arreglo_tab
         createFile.push('" \n\n')
         createFile.push('mycursor.execute(sql) \n\n')
         createFile.push('myresult = mycursor.fetchall() \n\n')
-        createFile.push('for x in myresult: \n\n')
+        createFile.push('for x in myresult: \n')
         createFile.push('    print(x)\n\n')        
         $('#staticBackdrop').modal({
             keyboard: false
